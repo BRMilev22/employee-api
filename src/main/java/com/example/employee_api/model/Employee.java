@@ -4,6 +4,7 @@ import com.example.employee_api.model.common.AuditableEntity;
 import com.example.employee_api.model.enums.EmployeeStatus;
 import com.example.employee_api.model.enums.EmploymentType;
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
@@ -112,8 +113,46 @@ public class Employee extends AuditableEntity {
     @JsonManagedReference("employee-position-history")
     private List<EmployeePositionHistory> positionHistory = new ArrayList<>();
     
-    @Column(name = "manager_id")
-    private Long managerId;
+    // Manager-Subordinate relationships
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "manager_id")
+    @JsonBackReference("manager-subordinates")
+    private Employee manager;
+    
+    @OneToMany(mappedBy = "manager", fetch = FetchType.LAZY)
+    @JsonManagedReference("manager-subordinates")
+    private List<Employee> subordinates = new ArrayList<>();
+    
+    // Performance Management relationships
+    @OneToMany(mappedBy = "employee", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonManagedReference("employee-reviews")
+    private List<PerformanceReview> performanceReviews = new ArrayList<>();
+    
+    @OneToMany(mappedBy = "reviewer", fetch = FetchType.LAZY)
+    @JsonManagedReference("reviewer-reviews")
+    private List<PerformanceReview> reviewsAsReviewer = new ArrayList<>();
+    
+    @OneToMany(mappedBy = "employee", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonManagedReference("employee-goals")
+    private List<Goal> goals = new ArrayList<>();
+
+    // Payroll relationships
+    @OneToMany(mappedBy = "employee", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonManagedReference("employee-salary-history")
+    private List<SalaryHistory> salaryHistory = new ArrayList<>();
+
+    @OneToMany(mappedBy = "employee", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonManagedReference("employee-bonuses")
+    private List<Bonus> bonuses = new ArrayList<>();
+
+    @OneToMany(mappedBy = "employee", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonManagedReference("employee-deductions")
+    private List<Deduction> deductions = new ArrayList<>();
+
+    // Document relationships
+    @OneToMany(mappedBy = "employee", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonIgnore
+    private List<Document> documents = new ArrayList<>();
     
     @JsonFormat(pattern = "yyyy-MM-dd")
     @PastOrPresent(message = "Hire date cannot be in the future")
@@ -128,6 +167,12 @@ public class Employee extends AuditableEntity {
     @Digits(integer = 10, fraction = 2, message = "Salary format is invalid")
     @Column(name = "salary", precision = 12, scale = 2)
     private BigDecimal salary;
+
+    // Pay grade relationship
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "pay_grade_id")
+    @JsonBackReference("paygrade-employees")
+    private PayGrade payGrade;
     
     @NotNull(message = "Employment type is required")
     @Enumerated(EnumType.STRING)
@@ -327,12 +372,82 @@ public class Employee extends AuditableEntity {
 
     public void setPositionHistory(List<EmployeePositionHistory> positionHistory) {
         this.positionHistory = positionHistory;
-    }    public Long getManagerId() {
-        return managerId;
     }
     
-    public void setManagerId(Long managerId) {
-        this.managerId = managerId;
+    public Employee getManager() {
+        return manager;
+    }
+    
+    public void setManager(Employee manager) {
+        this.manager = manager;
+    }
+    
+    public Long getManagerId() {
+        return manager != null ? manager.getId() : null;
+    }
+    
+    public List<Employee> getSubordinates() {
+        return subordinates;
+    }
+    
+    public void setSubordinates(List<Employee> subordinates) {
+        this.subordinates = subordinates;
+    }
+    
+    public List<PerformanceReview> getPerformanceReviews() {
+        return performanceReviews;
+    }
+    
+    public void setPerformanceReviews(List<PerformanceReview> performanceReviews) {
+        this.performanceReviews = performanceReviews;
+    }
+    
+    public List<PerformanceReview> getReviewsAsReviewer() {
+        return reviewsAsReviewer;
+    }
+    
+    public void setReviewsAsReviewer(List<PerformanceReview> reviewsAsReviewer) {
+        this.reviewsAsReviewer = reviewsAsReviewer;
+    }
+    
+    public List<Goal> getGoals() {
+        return goals;
+    }
+    
+    public void setGoals(List<Goal> goals) {
+        this.goals = goals;
+    }
+
+    public List<SalaryHistory> getSalaryHistory() {
+        return salaryHistory;
+    }
+
+    public void setSalaryHistory(List<SalaryHistory> salaryHistory) {
+        this.salaryHistory = salaryHistory;
+    }
+
+    public List<Bonus> getBonuses() {
+        return bonuses;
+    }
+
+    public void setBonuses(List<Bonus> bonuses) {
+        this.bonuses = bonuses;
+    }
+
+    public List<Deduction> getDeductions() {
+        return deductions;
+    }
+
+    public void setDeductions(List<Deduction> deductions) {
+        this.deductions = deductions;
+    }
+
+    public List<Document> getDocuments() {
+        return documents;
+    }
+
+    public void setDocuments(List<Document> documents) {
+        this.documents = documents;
     }
     
     public LocalDate getHireDate() {
@@ -357,6 +472,14 @@ public class Employee extends AuditableEntity {
     
     public void setSalary(BigDecimal salary) {
         this.salary = salary;
+    }
+
+    public PayGrade getPayGrade() {
+        return payGrade;
+    }
+
+    public void setPayGrade(PayGrade payGrade) {
+        this.payGrade = payGrade;
     }
     
     public EmploymentType getEmploymentType() {
@@ -421,6 +544,42 @@ public class Employee extends AuditableEntity {
     
     public void setProfilePictureUrl(String profilePictureUrl) {
         this.profilePictureUrl = profilePictureUrl;
+    }
+    
+    // Hierarchy utility methods
+    
+    /**
+     * Add a subordinate to this employee (manager)
+     */
+    public void addSubordinate(Employee subordinate) {
+        if (subordinate != null) {
+            subordinates.add(subordinate);
+            subordinate.setManager(this);
+        }
+    }
+    
+    /**
+     * Remove a subordinate from this employee (manager)
+     */
+    public void removeSubordinate(Employee subordinate) {
+        if (subordinate != null) {
+            subordinates.remove(subordinate);
+            subordinate.setManager(null);
+        }
+    }
+    
+    /**
+     * Check if this employee is a manager (has subordinates)
+     */
+    public boolean isManager() {
+        return subordinates != null && !subordinates.isEmpty();
+    }
+    
+    /**
+     * Check if this employee has a manager
+     */
+    public boolean hasManager() {
+        return manager != null;
     }
     
     @Override

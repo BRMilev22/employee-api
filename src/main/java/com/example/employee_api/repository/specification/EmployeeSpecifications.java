@@ -226,12 +226,12 @@ public class EmployeeSpecifications {
             if (managerId == null) {
                 return criteriaBuilder.conjunction();
             }
-            return criteriaBuilder.equal(root.get("managerId"), managerId);
+            return criteriaBuilder.equal(root.get("manager").get("id"), managerId);
         };
     }
 
     public static Specification<Employee> hasNoManager() {
-        return (root, query, criteriaBuilder) -> criteriaBuilder.isNull(root.get("managerId"));
+        return (root, query, criteriaBuilder) -> criteriaBuilder.isNull(root.get("manager"));
     }
 
     public static Specification<Employee> livesInCity(String city) {

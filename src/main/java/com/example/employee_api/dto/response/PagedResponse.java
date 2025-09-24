@@ -55,6 +55,25 @@ public class PagedResponse<T> {
             sortDirection
         );
     }
+
+    // Factory method to create with custom content and Spring's Page metadata
+    public static <T, U> PagedResponse<U> of(org.springframework.data.domain.Page<T> page, 
+                                            String sortBy, String sortDirection, 
+                                            java.util.List<U> content) {
+        return new PagedResponse<>(
+            content,
+            page.getNumber(),
+            page.getSize(),
+            page.getTotalElements(),
+            page.getTotalPages(),
+            page.isFirst(),
+            page.isLast(),
+            page.isEmpty(),
+            content.size(),
+            sortBy,
+            sortDirection
+        );
+    }
     
     // Getters and Setters
     public List<T> getContent() {

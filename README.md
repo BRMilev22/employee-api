@@ -4,25 +4,26 @@ I work mostly as a web developer with TypeScript and JavaScript stuff. At first,
 
 ### 🛠 Tech Stack
 
-- **Java 17** 
-- **Spring Boot 3.4.9** 
-- **Spring Security** 
-- **JWT** 
-- **MySQL** 
-- **JPA/Hibernate** 
-- **Maven** 
+- **Java 17**
+- **Spring Boot 3.4.9**
+- **Spring Security**
+- **JWT**
+- **MySQL**
+- **JPA/Hibernate**
+- **Maven**
 - **JUnit 5**
 
 ### **What I Actually Built**
 
 This turned out to be my first serious Java project. And honestly, I'm kind of surprised at how it came together. I used **Java 17** and **Spring Boot 3.4.9.** Ended up with a pretty solid Employee Management System. It works well, too.
 
-- **146 RESTful API endpoints** covering all the main CRUD operations (More endpoints to come)
-- **100% test coverage** (146/146 integration tests passing) - took forever but worth it
+- **371 RESTful API endpoints** covering all the main CRUD operations (More endpoints to come)
+- **100% test coverage** (430/430 integration tests passing) - took forever but worth it
 - **JWT authentication and role-based security** - way easier than I expected with Spring
 - **Complete leave management system** with approval workflows and document uploads
 - **Advanced search and filtering** that actually performs well
 - **Clean code structure** following what I learned about Spring Boot patterns
+➡️ **[Full list of API endpoints](endpoints.md)** – every controller and endpoint is documented there.
 
 ### **What I Learned**
 

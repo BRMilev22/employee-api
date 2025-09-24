@@ -336,4 +336,134 @@ public class EmployeeService {
         // Default to lastName if invalid field
         return "lastName";
     }
+    
+    // ========== NEW LOCATION AND MANAGER FILTERING METHODS ==========
+    
+    /**
+     * Get employees by location (city/state)
+     */
+    public List<Employee> getEmployeesByLocation(String city, String state, String postalCode) {
+        // Build specification for combined filtering
+        Specification<Employee> spec = Specification.where(null);
+        
+        if (city != null && !city.trim().isEmpty()) {
+            spec = spec.and((root, query, criteriaBuilder) ->
+                criteriaBuilder.equal(
+                    criteriaBuilder.lower(root.get("city")),
+                    city.trim().toLowerCase()
+                )
+            );
+        }
+        
+        if (state != null && !state.trim().isEmpty()) {
+            spec = spec.and((root, query, criteriaBuilder) ->
+                criteriaBuilder.equal(
+                    criteriaBuilder.lower(root.get("state")),
+                    state.trim().toLowerCase()
+                )
+            );
+        }
+        
+        if (postalCode != null && !postalCode.trim().isEmpty()) {
+            spec = spec.and((root, query, criteriaBuilder) ->
+                criteriaBuilder.equal(root.get("postalCode"), postalCode.trim())
+            );
+        }
+        
+        return employeeRepository.findAll(spec);
+    }
+    
+    /**
+     * Get employees without manager
+     */
+    public List<Employee> getEmployeesWithoutManager(EmployeeStatus status) {
+        if (status != null) {
+            // Filter by status as well using Specification
+            Specification<Employee> spec = (root, query, criteriaBuilder) ->
+                criteriaBuilder.and(
+                    criteriaBuilder.isNull(root.get("manager")),
+                    criteriaBuilder.equal(root.get("status"), status)
+                );
+            return employeeRepository.findAll(spec);
+        }
+        return employeeRepository.findEmployeesWithoutManager();
+    }
+    
+    /**
+     * Export employees data in CSV format
+     */
+    public String exportEmployeesToCSV(String name, Long departmentId, EmployeeStatus status) {
+        // Get employees based on filter criteria
+        List<Employee> employees = getFilteredEmployeesForExport(name, departmentId, status);
+        
+        StringBuilder csvBuilder = new StringBuilder();
+        
+        // CSV Header
+        csvBuilder.append("Employee ID,First Name,Last Name,Email,Job Title,Department,Status,Salary,Hire Date,Phone,City,State\n");
+        
+        // CSV Data
+        for (Employee employee : employees) {
+            csvBuilder.append(formatCSVRow(
+                employee.getEmployeeId(),
+                employee.getFirstName(),
+                employee.getLastName(),
+                employee.getEmail(),
+                employee.getJobTitle(),
+                employee.getDepartment() != null ? employee.getDepartment().getName() : "",
+                employee.getStatus().toString(),
+                employee.getSalary() != null ? employee.getSalary().toString() : "",
+                employee.getHireDate() != null ? employee.getHireDate().toString() : "",
+                employee.getPhone() != null ? employee.getPhone() : "",
+                employee.getCity() != null ? employee.getCity() : "",
+                employee.getState() != null ? employee.getState() : ""
+            )).append("\n");
+        }
+        
+        return csvBuilder.toString();
+    }
+    
+    /**
+     * Get filtered employees for export
+     */
+    private List<Employee> getFilteredEmployeesForExport(String name, Long departmentId, EmployeeStatus status) {
+        EmployeeSearchCriteria criteria = new EmployeeSearchCriteria();
+        
+        if (name != null && !name.trim().isEmpty()) {
+            criteria.setFirstName(name.trim());
+        }
+        if (departmentId != null) {
+            criteria.setDepartmentId(departmentId);
+        }
+        if (status != null) {
+            criteria.setStatus(status);
+        }
+        
+        // Use existing search functionality if we have criteria
+        if (name != null || departmentId != null || status != null) {
+            Specification<Employee> spec = buildSpecification(criteria);
+            return employeeRepository.findAll(spec);
+        }
+        
+        // Otherwise return all employees
+        return employeeRepository.findAll();
+    }
+    
+    /**
+     * Format CSV row with proper escaping
+     */
+    private String formatCSVRow(String... values) {
+        StringBuilder row = new StringBuilder();
+        for (int i = 0; i < values.length; i++) {
+            if (i > 0) {
+                row.append(",");
+            }
+            String value = values[i] != null ? values[i] : "";
+            // Escape quotes and wrap in quotes if contains comma or quote
+            if (value.contains(",") || value.contains("\"") || value.contains("\n")) {
+                value = "\"" + value.replace("\"", "\"\"") + "\"";
+            }
+            row.append(value);
+        }
+        return row.toString();
+    }
 }

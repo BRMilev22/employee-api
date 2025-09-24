@@ -105,6 +105,8 @@ public class SecurityConfig {
                     .requestMatchers("/api/leave-types/**").hasAnyRole("USER", "HR", "ADMIN", "SUPER_ADMIN")
                     .requestMatchers("/api/leave-requests/**").hasAnyRole("USER", "HR", "ADMIN", "SUPER_ADMIN")
                     .requestMatchers("/api/leave-documents/**").hasAnyRole("USER", "HR", "ADMIN", "SUPER_ADMIN")
+                    // Attendance endpoints
+                    .requestMatchers("/api/attendance/**").hasAnyRole("USER", "EMPLOYEE", "HR", "ADMIN", "SUPER_ADMIN")
                     // Admin only endpoints
                     .requestMatchers("/api/admin/**").hasAnyRole("ADMIN", "SUPER_ADMIN")
                     .requestMatchers("/api/users/**").hasAnyRole("ADMIN", "SUPER_ADMIN")

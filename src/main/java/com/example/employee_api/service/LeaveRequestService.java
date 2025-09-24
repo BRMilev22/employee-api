@@ -30,6 +30,9 @@ public class LeaveRequestService {
 
     @Autowired
     private LeaveBalanceService leaveBalanceService;
+    
+    @Autowired
+    private NotificationService notificationService;
 
     /**
      * Get all leave requests with pagination
@@ -127,6 +130,22 @@ public class LeaveRequestService {
                 totalDays
         );
         
+        // Send notification to manager about new leave request
+        try {
+            Employee employee = leaveRequest.getEmployee();
+            Employee manager = employee.getManager();
+            if (manager != null) {
+                notificationService.sendLeaveRequestNotification(
+                    savedRequest.getId(),
+                    manager.getId(),
+                    employee.getFirstName() + " " + employee.getLastName()
+                );
+            }
+        } catch (Exception e) {
+            // Log error but don't fail the request creation
+            System.err.println("Failed to send leave request notification: " + e.getMessage());
+        }
+        
         return savedRequest;
     }
 
@@ -218,7 +237,21 @@ public class LeaveRequestService {
                 leaveRequest.getTotalDays()
         );
         
-        return leaveRequestRepository.save(leaveRequest);
+        LeaveRequest savedRequest = leaveRequestRepository.save(leaveRequest);
+        
+        // Send notification to employee about approval
+        try {
+            notificationService.sendLeaveApprovalNotification(
+                savedRequest.getId(),
+                leaveRequest.getEmployee().getId(),
+                approver.getFirstName() + " " + approver.getLastName()
+            );
+        } catch (Exception e) {
+            // Log error but don't fail the approval
+            System.err.println("Failed to send leave approval notification: " + e.getMessage());
+        }
+
+        return savedRequest;
     }
 
     /**
@@ -250,7 +283,21 @@ public class LeaveRequestService {
                 leaveRequest.getTotalDays()
         );
         
-        return leaveRequestRepository.save(leaveRequest);
+        LeaveRequest savedRequest = leaveRequestRepository.save(leaveRequest);
+        
+        // Send notification to employee about rejection
+        try {
+            notificationService.sendLeaveApprovalNotification(
+                savedRequest.getId(),
+                leaveRequest.getEmployee().getId(),
+                rejector.getFirstName() + " " + rejector.getLastName()
+            );
+        } catch (Exception e) {
+            // Log error but don't fail the rejection
+            System.err.println("Failed to send leave rejection notification: " + e.getMessage());
+        }
+        
+        return savedRequest;
     }
 
     /**

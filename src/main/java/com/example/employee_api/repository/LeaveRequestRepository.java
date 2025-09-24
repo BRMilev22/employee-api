@@ -155,7 +155,7 @@ public interface LeaveRequestRepository extends JpaRepository<LeaveRequest, Long
      * Find team leave requests for a manager
      */
     @Query("SELECT lr FROM LeaveRequest lr WHERE " +
-           "lr.employee.managerId = :managerId AND " +
+           "lr.employee.manager.id = :managerId AND " +
            "lr.status = :status")
     List<LeaveRequest> findTeamLeaveRequestsByManagerAndStatus(@Param("managerId") Long managerId, 
                                                               @Param("status") LeaveRequest.LeaveStatus status);

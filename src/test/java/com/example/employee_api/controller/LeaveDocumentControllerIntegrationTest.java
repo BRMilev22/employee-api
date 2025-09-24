@@ -12,6 +12,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -28,6 +29,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @ActiveProfiles("test")
 @Transactional
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 class LeaveDocumentControllerIntegrationTest {
 
     @Autowired
@@ -333,9 +335,9 @@ class LeaveDocumentControllerIntegrationTest {
     void testDeleteDocumentWithEmployeeRole() throws Exception {
         // Try to delete document with USER role - should be forbidden
         // Since the delete endpoint requires ADMIN or HR_MANAGER roles
-        // Note: Currently returns 500 due to system constraint issues
+        // Should return 403 Forbidden for insufficient permissions
         mockMvc.perform(delete("/api/leave-documents/" + testDocument.getId())
                 .with(csrf()))
-                .andExpect(status().is5xxServerError()); // Documenting current behavior
+                .andExpect(status().isForbidden()); // Now properly returns 403
     }
 }

@@ -187,9 +187,8 @@ public class EmployeeController {
     public ResponseEntity<List<Employee>> getRecentlyCreatedEmployees(
             @RequestParam(defaultValue = "7") int days) {
         
-        LocalDate sinceDate = LocalDate.now().minusDays(days);
-        // Note: This would require adding the method to the repository
-        return ResponseEntity.ok(List.of()); // Placeholder
+        // This would require adding the method to the repository for created date filtering
+        return ResponseEntity.ok(List.of()); // Placeholder - requires audit field implementation
     }
     
     /**
@@ -205,9 +204,10 @@ public class EmployeeController {
      * GET /api/employees/without-manager - Get employees without a manager
      */
     @GetMapping("/without-manager")
-    public ResponseEntity<List<Employee>> getEmployeesWithoutManager() {
-        // This would use the repository method findEmployeesWithoutManager()
-        return ResponseEntity.ok(List.of()); // Placeholder
+    public ResponseEntity<List<Employee>> getEmployeesWithoutManager(
+            @RequestParam(required = false) EmployeeStatus status) {
+        List<Employee> employees = employeeService.getEmployeesWithoutManager(status);
+        return ResponseEntity.ok(employees);
     }
     
     /**
@@ -219,8 +219,15 @@ public class EmployeeController {
             @RequestParam(required = false) String state,
             @RequestParam(required = false) String postalCode) {
         
-        // This would use location-based repository methods
-        return ResponseEntity.ok(List.of()); // Placeholder
+        // Validate that at least one parameter is provided
+        if ((city == null || city.trim().isEmpty()) && 
+            (state == null || state.trim().isEmpty()) && 
+            (postalCode == null || postalCode.trim().isEmpty())) {
+            return ResponseEntity.badRequest().build();
+        }
+        
+        List<Employee> employees = employeeService.getEmployeesByLocation(city, state, postalCode);
+        return ResponseEntity.ok(employees);
     }
     
     /**
@@ -233,7 +240,15 @@ public class EmployeeController {
             @RequestParam(required = false) Long departmentId,
             @RequestParam(required = false) EmployeeStatus status) {
         
-        // This would implement export functionality
-        return ResponseEntity.ok("Export functionality to be implemented");
+        if (!"csv".equalsIgnoreCase(format)) {
+            return ResponseEntity.badRequest().body("Only CSV format is currently supported");
+        }
+        
+        String csvData = employeeService.exportEmployeesToCSV(name, departmentId, status);
+        
+        return ResponseEntity.ok()
+                .header("Content-Type", "text/csv")
+                .header("Content-Disposition", "attachment; filename=\"employees.csv\"")
+                .body(csvData);
     }
 }

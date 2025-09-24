@@ -3,11 +3,13 @@ package com.example.employee_api.controller;
 import com.example.employee_api.dto.auth.*;
 import com.example.employee_api.model.User;
 import com.example.employee_api.service.AuthService;
+import com.example.employee_api.service.AuditLogService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import java.util.Map;
 
@@ -21,16 +23,40 @@ public class AuthController {
 
     @Autowired
     private AuthService authService;
+    
+    @Autowired
+    private AuditLogService auditLogService;
 
     /**
      * Authenticate user
      */
     @PostMapping("/login")
-    public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
+    public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest, HttpServletRequest request) {
+        String ipAddress = getClientIpAddress(request);
+        
         try {
             JwtResponse jwtResponse = authService.authenticateUser(loginRequest);
+            
+            // Log successful login
+            auditLogService.logAuthenticationEvent(
+                loginRequest.getUsernameOrEmail(),
+                AuditLogService.ACTION_LOGIN,
+                true,
+                null,
+                ipAddress
+            );
+            
             return ResponseEntity.ok(jwtResponse);
         } catch (Exception e) {
+            // Log failed login
+            auditLogService.logAuthenticationEvent(
+                loginRequest.getUsernameOrEmail(),
+                AuditLogService.ACTION_LOGIN_FAILED,
+                false,
+                e.getMessage(),
+                ipAddress
+            );
+            
             return ResponseEntity.badRequest()
                     .body(Map.of(
                             "error", "Authentication failed",
@@ -83,10 +109,27 @@ public class AuthController {
      */
     @PostMapping("/logout")
     @PreAuthorize("hasRole('USER')")
-    public ResponseEntity<?> logoutUser(@RequestBody Map<String, String> request) {
+    public ResponseEntity<?> logoutUser(@RequestBody Map<String, String> requestBody, HttpServletRequest request) {
         try {
-            String refreshToken = request.get("refreshToken");
+            String ipAddress = getClientIpAddress(request);
+            String refreshToken = requestBody.get("refreshToken");
+            
+            // Get current user for logging
+            User currentUser = authService.getCurrentUser();
+            String username = currentUser != null ? currentUser.getUsername() : "UNKNOWN";
+            
+            // Logout the user and revoke refresh token
             authService.logoutUser(refreshToken);
+            
+            // Log logout event
+            auditLogService.logAuthenticationEvent(
+                username,
+                AuditLogService.ACTION_LOGOUT,
+                true,
+                null,
+                ipAddress
+            );
+            
             return ResponseEntity.ok(Map.of("message", "User logged out successfully"));
         } catch (Exception e) {
             return ResponseEntity.badRequest()
@@ -239,5 +282,22 @@ public class AuthController {
                             "message", e.getMessage()
                     ));
         }
+    }
+    
+    /**
+     * Helper method to get client IP address
+     */
+    private String getClientIpAddress(HttpServletRequest request) {
+        String xForwardedForHeader = request.getHeader("X-Forwarded-For");
+        if (xForwardedForHeader != null && !xForwardedForHeader.isEmpty()) {
+            return xForwardedForHeader.split(",")[0].trim();
+        }
+        
+        String xRealIpHeader = request.getHeader("X-Real-IP");
+        if (xRealIpHeader != null && !xRealIpHeader.isEmpty()) {
+            return xRealIpHeader;
+        }
+        
+        return request.getRemoteAddr();
     }
 }

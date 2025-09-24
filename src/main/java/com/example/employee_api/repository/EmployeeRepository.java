@@ -75,10 +75,10 @@ public interface EmployeeRepository extends JpaRepository<Employee, Long>, JpaSp
     List<Employee> findByEmploymentTypes(@Param("types") List<EmploymentType> types);
     
     // Manager-based queries
-    @Query("SELECT e FROM Employee e WHERE e.managerId = :managerId")
+    @Query("SELECT e FROM Employee e WHERE e.manager.id = :managerId")
     List<Employee> findByManagerId(@Param("managerId") Long managerId);
     
-    @Query("SELECT e FROM Employee e WHERE e.managerId IS NULL")
+    @Query("SELECT e FROM Employee e WHERE e.manager IS NULL")
     List<Employee> findEmployeesWithoutManager();
     
     // Location-based queries
@@ -140,4 +140,46 @@ public interface EmployeeRepository extends JpaRepository<Employee, Long>, JpaSp
            "LOWER(e.employeeId) LIKE LOWER(CONCAT('%', :searchTerm, '%')) OR " +
            "LOWER(e.phone) LIKE LOWER(CONCAT('%', :searchTerm, '%'))")
     Page<Employee> fullTextSearch(@Param("searchTerm") String searchTerm, Pageable pageable);
+    
+    // Hierarchy-related queries
+    
+    /**
+     * Find all employees without a manager (top-level employees)
+     */
+    @Query("SELECT e FROM Employee e WHERE e.manager IS NULL")
+    List<Employee> findTopLevelEmployees();
+    
+    /**
+     * Find all managers (employees who have subordinates)
+     */
+    @Query("SELECT DISTINCT e FROM Employee e WHERE e.id IN (SELECT m.manager.id FROM Employee m WHERE m.manager IS NOT NULL)")
+    List<Employee> findAllManagers();
+    
+    /**
+     * Get the reporting chain for an employee (all managers up to top level)
+     */
+    @Query(value = "WITH RECURSIVE reporting_chain AS (" +
+                   "  SELECT id, manager_id, first_name, last_name, 0 as level " +
+                   "  FROM employees WHERE id = :employeeId " +
+                   "  UNION ALL " +
+                   "  SELECT e.id, e.manager_id, e.first_name, e.last_name, rc.level + 1 " +
+                   "  FROM employees e " +
+                   "  JOIN reporting_chain rc ON e.id = rc.manager_id " +
+                   ") " +
+                   "SELECT * FROM reporting_chain WHERE level > 0 ORDER BY level", 
+           nativeQuery = true)
+    List<Object[]> findReportingChain(@Param("employeeId") Long employeeId);
+    
+    /**
+     * Check if any employees are assigned to a specific pay grade
+     */
+    @Query("SELECT CASE WHEN COUNT(e) > 0 THEN true ELSE false END FROM Employee e WHERE e.payGrade.id = :payGradeId")
+    boolean existsByPayGradeId(@Param("payGradeId") Long payGradeId);
+    
+    /**
+     * Check if creating a manager relationship would create a circular reference
+     * Note: This method is replaced with programmatic logic in EmployeeHierarchyService
+     * due to database compatibility issues with recursive queries
+     */
+    // Removed complex recursive query - using programmatic approach instead
 }

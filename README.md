@@ -12,22 +12,36 @@ I work mostly as a web developer with TypeScript and JavaScript stuff. At first,
 - **JPA/Hibernate**
 - **Maven**
 - **JUnit 5**
+- **OpenAPI 3.1 (Springdoc 2.8.5)**
 
 ### **What I Actually Built**
 
 This turned out to be my first serious Java project. And honestly, I'm kind of surprised at how it came together. I used **Java 17** and **Spring Boot 3.4.9.** Ended up with a pretty solid Employee Management System. It works well, too.
 
-- **371 RESTful API endpoints** covering all the main CRUD operations (More endpoints to come)
+- **344 RESTful API endpoints** covering all the main CRUD operations (More endpoints to come)
 - **100% test coverage** (430/430 integration tests passing) - took forever but worth it
+
+![All Tests Passing](media/allTestsPassing.png)
+
 - **JWT authentication and role-based security** - way easier than I expected with Spring
 - **Complete leave management system** with approval workflows and document uploads
 - **Advanced search and filtering** that actually performs well
 - **Clean code structure** following what I learned about Spring Boot patterns
-
-➡️ **[Full list of API endpoints](endpoints.md)** – every controller and endpoint is documented there.
+- **Interactive API documentation** with Swagger UI available at `/swagger-ui.html`
 
 ### **What I Learned**
 
 Coming from TypeScript, JavaScript, and C++, I figured I knew what Java would be like. But Spring Boot flipped that around for me. The framework takes care of so much boilerplate I was dreading. And the ecosystem, it's more mature than I gave it credit for. Now I actually like Java. The type safety feels familiar, kind of like TypeScript. Tooling is solid too.
 
 **The result?** A working Employee Management System that I'm actually proud of for my first Java project.
+
+### **API Documentation**
+
+The API is fully documented with OpenAPI 3.1 specification. You can explore all endpoints interactively:
+
+- **Swagger UI**: Available at `http://localhost:8080/swagger-ui.html`
+- **OpenAPI JSON**: Available at `http://localhost:8080/v3/api-docs`
+
+![Swagger UI Demo](media/demo.gif)
+
+The documentation includes detailed schemas, authentication requirements, and example requests/responses for all 344 endpoints. JWT authentication is required for most endpoints - get your token from the `/api/auth/login` endpoint first.

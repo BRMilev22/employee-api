@@ -5,13 +5,13 @@
 ## Authentication & User Management (31 endpoints)
 
 ### Public Endpoints (2 endpoints)
-```http
+```bash
 GET    /api/public/health           # API health check (no auth required)
 GET    /api/public/auth-test        # Authentication status test
 ```
 
 ### Authentication Endpoints (10 endpoints)
-```http
+```bash
 POST   /api/auth/login              # User login
    Request: { "usernameOrEmail": "string", "password": "string" }
    Response: { "accessToken": "jwt_token", "refreshToken": "token", "tokenType": "Bearer", "expiresIn": 3600, "user": {...} }
@@ -53,7 +53,7 @@ POST   /api/auth/change-password    # Change password for authenticated user
 ```
 
 ### User Management (10 endpoints)
-```http
+```bash
   GET    /api/users                   # Get all users with pagination
    Query: ?page=0&size=20&sortBy=username&sortDirection=asc
    Response: PagedResponse<UserResponse>
@@ -87,7 +87,7 @@ POST   /api/auth/change-password    # Change password for authenticated user
 ```
 
 ### Role Management (9 endpoints)
-```http
+```bash
   GET    /api/roles                   # Get all roles
    Response: List<RoleResponse>
 
@@ -121,7 +121,7 @@ POST   /api/auth/change-password    # Change password for authenticated user
 ## Employee Management (18 endpoints)
 
 ### Core Employee Operations (6 endpoints)
-```http
+```bash
   GET    /api/employees               # Get all employees
    Response: List<EmployeeResponse>
 
@@ -144,7 +144,7 @@ POST   /api/auth/change-password    # Change password for authenticated user
 ```
 
 ### Advanced Search & Filtering (12 endpoints)
-```http
+```bash
   POST   /api/employees/search        # Advanced search with comprehensive filtering
    Request: EmployeeSearchCriteria { "firstName": "string", "lastName": "string", "email": "string", "departmentId": "number", "status": "ACTIVE", "minSalary": 50000, "maxSalary": 100000, "hireStartDate": "date", "hireEndDate": "date", "city": "string", "state": "string", "page": 0, "size": 20, "sortBy": "lastName", "sortDirection": "asc" }
    Response: PagedResponse<EmployeeResponse>
@@ -194,7 +194,7 @@ POST   /api/auth/change-password    # Change password for authenticated user
 
 ## Employee Hierarchy Management (7 endpoints)
 
-```http
+```bash
   POST   /api/employees/hierarchy/{employeeId}/manager/{managerId}  # Assign a manager to an employee
    Response: { "message": "Manager assigned successfully" }
 
@@ -219,7 +219,7 @@ POST   /api/auth/change-password    # Change password for authenticated user
 
 ## Employee Lifecycle Management (9 endpoints)
 
-```http
+```bash
   POST   /api/employees/lifecycle/{employeeId}/activate       # Activate an employee
    Query: ?reason=string
    Response: { "message": "Employee activated successfully" }
@@ -259,7 +259,7 @@ POST   /api/auth/change-password    # Change password for authenticated user
 ## Department Management (19 endpoints)
 
 ### Core Department Operations (14 endpoints)
-```http
+```bash
   GET    /api/departments                      # Get all departments
    Response: List<DepartmentResponse>
 
@@ -308,7 +308,7 @@ POST   /api/auth/change-password    # Change password for authenticated user
 ```
 
 ### Department Hierarchy & Management (5 endpoints)
-```http
+```bash
   PUT    /api/departments/{id}/manager/{managerId}           # Assign manager to department
    Response: { "message": "Manager assigned successfully" }
 
@@ -328,7 +328,7 @@ POST   /api/auth/change-password    # Change password for authenticated user
 ## Position & Job Management (22 endpoints)
 
 ### Core Position Operations (15 endpoints)
-```http
+```bash
   POST   /api/positions                        # Create new position
    Request: { "title": "string", "description": "string", "departmentId": "number", "level": "ENTRY_LEVEL", "minSalary": 50000, "maxSalary": 80000 }
    Response: PositionResponse
@@ -380,7 +380,7 @@ POST   /api/auth/change-password    # Change password for authenticated user
 ```
 
 ### Employee-Position Assignment & History (7 endpoints)
-```http
+```bash
   POST   /api/positions/{positionId}/assign-employee      # Assign employee to position
    Query: ?employeeId=number&startDate=date&salary=number&reason=string
    Response: { "message": "Employee assigned to position successfully" }
@@ -405,7 +405,7 @@ POST   /api/auth/change-password    # Change password for authenticated user
 ## Leave Management System (68 endpoints)
 
 ### Leave Types & Policies (13 endpoints)
-```http
+```bash
   GET    /api/leave-types             # Get all leave types with pagination
    Query: ?page=0&size=20&sortBy=name&sortDirection=asc
    Response: PagedResponse<LeaveTypeResponse>
@@ -449,7 +449,7 @@ POST   /api/auth/change-password    # Change password for authenticated user
 ```
 
 ### Leave Balance Management (14 endpoints)
-```http
+```bash
   GET    /api/leave-balances          # Get all leave balances with pagination
    Query: ?page=0&size=20&sortBy=year&sortDirection=desc
    Response: PagedResponse<LeaveBalanceResponse>
@@ -496,7 +496,7 @@ POST   /api/auth/change-password    # Change password for authenticated user
 ```
 
 ### Leave Requests & Workflow (17 endpoints)
-```http
+```bash
   GET    /api/leave-requests          # Get all leave requests with pagination
    Query: ?page=0&size=20&sortBy=startDate&sortDirection=desc
    Response: PagedResponse<LeaveRequestResponse>
@@ -553,7 +553,7 @@ POST   /api/auth/change-password    # Change password for authenticated user
 ```
 
 ### Leave Document Management (24 endpoints)
-```http
+```bash
   GET    /api/leave-documents         # Get all leave documents with pagination
    Query: ?page=0&size=20&sortBy=uploadedAt&sortDirection=desc
    Response: PagedResponse<LeaveDocumentResponse>
@@ -635,7 +635,7 @@ POST   /api/auth/change-password    # Change password for authenticated user
 ## Performance Management System (38 endpoints)
 
 ### Performance Review Management (19 endpoints)
-```http
+```bash
   GET    /api/performance/reviews                         # Get all performance reviews
    Response: List<PerformanceReviewResponse>
 
@@ -693,7 +693,7 @@ POST   /api/auth/change-password    # Change password for authenticated user
 ```
 
 ### Goal Management (19 endpoints)
-```http
+```bash
   GET    /api/performance/goals                           # Get all goals
    Response: List<GoalResponse>
 
@@ -760,7 +760,7 @@ POST   /api/auth/change-password    # Change password for authenticated user
 ## Payroll & Compensation (26 endpoints)
 
 ### Salary & Compensation (7 endpoints)
-```http
+```bash
   GET    /api/payroll/salaries              # Get salary information
    Query: ?page=0&size=20&sortBy=salary&sortDir=desc
    Response: PagedResponse<SalaryResponse>
@@ -791,7 +791,7 @@ POST   /api/auth/change-password    # Change password for authenticated user
 ```
 
 ### Pay Grade Management (6 endpoints)
-```http
+```bash
   POST   /api/payroll/pay-grades            # Create pay grade
    Request: { "gradeName": "string", "minSalary": 50000, "maxSalary": 80000, "description": "string" }
    Response: PayGradeResponse
@@ -808,7 +808,7 @@ POST   /api/auth/change-password    # Change password for authenticated user
 ```
 
 ### Bonus Management (7 endpoints)
-```http
+```bash
   GET    /api/payroll/bonuses               # Get bonus records
    Query: ?employeeId=1&status=PENDING&type=PERFORMANCE
    Response: List<BonusResponse>
@@ -838,7 +838,7 @@ POST   /api/auth/change-password    # Change password for authenticated user
 ```
 
 ### Deduction Management (5 endpoints)
-```http
+```bash
   GET    /api/payroll/deductions            # Get deduction records
    Query: ?employeeId=1&status=ACTIVE&type=HEALTH_INSURANCE
    Response: List<DeductionResponse>
@@ -860,7 +860,7 @@ POST   /api/auth/change-password    # Change password for authenticated user
 ```
 
 ### Additional Payroll Endpoint (1 endpoint)
-```http
+```bash
   GET    /api/employees/{id}/compensation-summary # Get total compensation summary
    Response: CompensationSummaryResponse
 ```
@@ -868,7 +868,7 @@ POST   /api/auth/change-password    # Change password for authenticated user
 ## Document Management System (32 endpoints)
 
 ### Document Management (12 endpoints)
-```http
+```bash
   GET    /api/documents               # Get all documents with pagination
    Query: ?page=0&size=20&sortBy=createdAt&sortDir=desc
    Response: PagedResponse<DocumentResponse>
@@ -912,7 +912,7 @@ POST   /api/auth/change-password    # Change password for authenticated user
 ```
 
 ### Document Operations (3 endpoints)
-```http
+```bash
   GET    /api/documents/{id}/download # Download document file
    Response: File download
 
@@ -926,7 +926,7 @@ POST   /api/auth/change-password    # Change password for authenticated user
 ```
 
 ### Document Type Management (6 endpoints)
-```http
+```bash
   GET    /api/documents/types         # Get all document types
    Response: List<DocumentTypeResponse>
 
@@ -949,7 +949,7 @@ POST   /api/auth/change-password    # Change password for authenticated user
 ```
 
 ### Document Category Management (6 endpoints)
-```http
+```bash
   GET    /api/documents/categories         # Get all document categories
    Response: List<DocumentCategoryResponse>
 
@@ -972,7 +972,7 @@ POST   /api/auth/change-password    # Change password for authenticated user
 ```
 
 ### Utility Endpoints (5 endpoints)
-```http
+```bash
   GET    /api/documents/expiring      # Find documents expiring within specified days
    Query: ?days=30
    Response: List<DocumentResponse>
@@ -993,10 +993,10 @@ POST   /api/auth/change-password    # Change password for authenticated user
    Response: { "totalDocuments": 15, "activeDocuments": 12, "expiredDocuments": 3 }
 ```
 
-## ⏰ Time & Attendance Management (10 endpoints)
+## Time & Attendance Management (10 endpoints)
 
 ### Clock In/Out Operations (2 endpoints)
-```http
+```bash
   POST   /api/attendance/employees/{employeeId}/clock-in     # Clock in employee
    Request: { "location": "string", "notes": "string", "clockInTime": "datetime" }
    Response: TimeAttendanceResponse
@@ -1007,7 +1007,7 @@ POST   /api/auth/change-password    # Change password for authenticated user
 ```
 
 ### Break Management (2 endpoints)
-```http
+```bash
   POST   /api/attendance/employees/{employeeId}/breaks/start        # Start break
    Request: { "breakType": "LUNCH_BREAK", "notes": "string" }
    Response: AttendanceBreakResponse
@@ -1018,7 +1018,7 @@ POST   /api/auth/change-password    # Change password for authenticated user
 ```
 
 ### Attendance Query & Analytics (3 endpoints)
-```http
+```bash
   GET    /api/attendance/employees/{employeeId}                     # Get employee attendance records
    Query: ?page=0&size=20
    Response: PagedResponse<TimeAttendanceResponse>
@@ -1033,7 +1033,7 @@ POST   /api/auth/change-password    # Change password for authenticated user
 ```
 
 ### Attendance Correction Workflow (3 endpoints)
-```http
+```bash
   POST   /api/attendance/corrections                   # Submit attendance correction
    Query: ?employeeId=number
    Request: { "attendanceDate": "date", "correctionType": "CLOCK_IN_TIME", "originalValue": "string", "correctedValue": "string", "reason": "string" }
@@ -1053,7 +1053,7 @@ POST   /api/auth/change-password    # Change password for authenticated user
 ## Audit & Security Logging (13 endpoints)
 
 ### Audit Log Management (5 endpoints)
-```http
+```bash
   POST   /api/audit                     # Create audit log entry manually
    Request: { "action": "string", "entityType": "string", "entityId": "number", "details": "string" }
    Response: AuditLogResponse
@@ -1075,7 +1075,7 @@ POST   /api/auth/change-password    # Change password for authenticated user
 ```
 
 ### Security Event Monitoring (3 endpoints)
-```http
+```bash
   GET    /api/audit/security-events     # Get security events
    Query: ?page=0&size=20
    Response: PagedResponse<SecurityEventResponse>
@@ -1090,7 +1090,7 @@ POST   /api/auth/change-password    # Change password for authenticated user
 ```
 
 ### Audit Query & Analytics (4 endpoints)
-```http
+```bash
   GET    /api/audit/action/{actionType} # Get audit logs by action type
    Query: ?page=0&size=20
    Response: PagedResponse<AuditLogResponse>
@@ -1105,7 +1105,7 @@ POST   /api/auth/change-password    # Change password for authenticated user
 ```
 
 ### Audit Maintenance (1 endpoint)
-```http
+```bash
   DELETE /api/audit/cleanup             # Cleanup old audit logs
    Query: ?daysToKeep=365
    Response: { "message": "Audit cleanup completed", "recordsDeleted": 1500 }
@@ -1114,7 +1114,7 @@ POST   /api/auth/change-password    # Change password for authenticated user
 ## Notification System (15 endpoints)
 
 ### Notification Management (8 endpoints)
-```http
+```bash
   GET    /api/notifications                    # Get notifications for current user
    Query: ?page=0&size=20&status=UNREAD&sortBy=createdAt&sortDir=desc
    Response: PagedResponse<NotificationResponse>
@@ -1150,7 +1150,7 @@ POST   /api/auth/change-password    # Change password for authenticated user
 ```
 
 ### Notification Preferences (2 endpoints)
-```http
+```bash
   GET    /api/notifications/preferences        # Get current user's notification preferences
    Response: NotificationPreferencesResponse
 
@@ -1160,7 +1160,7 @@ POST   /api/auth/change-password    # Change password for authenticated user
 ```
 
 ### Notification Templates (5 endpoints)
-```http
+```bash
   GET    /api/notifications/templates          # Get all notification templates
    Response: List<NotificationTemplateResponse>
 
@@ -1179,10 +1179,10 @@ POST   /api/auth/change-password    # Change password for authenticated user
    Response: No Content (204)
 ```
 
-## 📊 Reporting & Analytics System (21 endpoints)
+## Reporting & Analytics System (21 endpoints)
 
 ### Standard Reports (9 endpoints)
-```http
+```bash
   POST   /api/reports                # Generate new report
    Request: { "reportType": "EMPLOYEE_SUMMARY", "name": "string", "description": "string", "parameters": {...}, "format": "PDF" }
    Response: ReportResponse
@@ -1219,7 +1219,7 @@ POST   /api/auth/change-password    # Change password for authenticated user
 ```
 
 ### Analytics Dashboard (9 endpoints)
-```http
+```bash
   GET    /api/reports/analytics/dashboard     # Get comprehensive dashboard data
    Response: DashboardDataResponse
 
@@ -1252,7 +1252,7 @@ POST   /api/auth/change-password    # Change password for authenticated user
 ```
 
 ### Utility Endpoints (3 endpoints)
-```http
+```bash
   GET    /api/reports/{id}/download # Download report file
    Response: File download
 
@@ -1266,7 +1266,7 @@ POST   /api/auth/change-password    # Change password for authenticated user
 ## File & Media Management System (15 endpoints)
 
 ### General File Operations (8 endpoints)
-```http
+```bash
   POST   /api/files/upload              # General file upload
    Request: multipart/form-data with file, fileType, description, tags, isPublic, employeeId
    Response: FileResponse
@@ -1297,7 +1297,7 @@ POST   /api/auth/change-password    # Change password for authenticated user
 ```
 
 ### Employee-Specific File Operations (2 endpoints)
-```http
+```bash
   GET    /api/files/employee/{employeeId}              # Get files for specific employee
    Response: List<FileResponse>
 
@@ -1306,7 +1306,7 @@ POST   /api/auth/change-password    # Change password for authenticated user
 ```
 
 ### Employee Photo Management (3 endpoints)
-```http
+```bash
   GET    /api/files/employees/{employeeId}/photo       # Get employee photo
    Response: Image file download with inline disposition
 
@@ -1319,7 +1319,7 @@ POST   /api/auth/change-password    # Change password for authenticated user
 ```
 
 ### Administrative File Operations (2 endpoints)
-```http
+```bash
   POST   /api/files/cleanup/expired     # Cleanup expired files (admin only)
    Response: { "message": "Expired files cleanup completed", "cleanedFilesCount": 15 }
 ```
@@ -1605,7 +1605,7 @@ FileMetadataResponse {
 - **Account Security**: Lockout policies, failed attempt tracking
 
 ### Authorization Patterns
-```http
+```bash
 # Public endpoints (no authentication required)
 GET /api/public/health
 
@@ -1686,7 +1686,7 @@ curl -X GET http://localhost:8080/api/employees \
 ## Summary Statistics
 
 **Total Controllers: 23**
-**Total API Endpoints: 371** (Verified from actual controller implementations)
+**Total API Endpoints: 371**
 
 **Endpoint Distribution by Controller:**
 1. PerformanceController: 38 endpoints
@@ -1714,5 +1714,3 @@ curl -X GET http://localhost:8080/api/employees \
 23. PublicController: 2 endpoints
 
 This comprehensive API provides all the functionality needed for a modern HR management system with **371 endpoints** covering authentication, employee management, leave tracking, performance reviews, payroll, document management, time tracking, and more! 
-
-**  Verified against actual controller implementations** - This documentation is now 100% accurate to what exists in the codebase.
